@@ -1,0 +1,29 @@
+{
+  "name": "jwt-auth",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/wintory/jwt-auth.git",
+  "author": "wintory <thanapol.sakul@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "build": "rimraf ./dist && tsc"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "typescript": "^5.7.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "eslint": "^9.17.0",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.4.2",
+    "ts-node": "^10.9.2",
+    "tsc": "^2.0.4"
+  }
+}

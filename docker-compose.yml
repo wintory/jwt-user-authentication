@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    env_file: '.env'
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+networks:
+  my_network:
+    driver: bridge
