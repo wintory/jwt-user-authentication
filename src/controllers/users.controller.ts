@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import User from '../models/user.model'
 import {
   createUser,
+  deleteUser,
   getAllUsers,
   getUserById,
   updateUser,
@@ -102,6 +103,36 @@ export const updateUserController = async (
     console.error(error)
     res.status(400).json({
       message: 'Update failed',
+    })
+  }
+}
+
+export const deleteUserController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = +req.params.id
+    const user = await User.findAll({ where: { id: userId } })
+
+    if (!user) {
+      res.status(404).json({
+        message: 'User not found',
+      })
+      return
+    }
+
+    const result = await deleteUser(userId)
+
+    if (result) {
+      res.status(200).json({
+        message: 'Delete success',
+      })
+    }
+  } catch (error) {
+    console.error(error)
+    res.status(400).json({
+      message: 'Delete failed',
     })
   }
 }

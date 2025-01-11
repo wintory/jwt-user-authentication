@@ -61,3 +61,9 @@ export const updateUser = async (userId: number, userData: any) => {
 
   return result
 }
+
+export const deleteUser = async (userId: number) => {
+  const result = await User.destroy({ where: { id: userId } })
+
+  return result
+}
