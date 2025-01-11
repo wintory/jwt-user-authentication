@@ -2,9 +2,9 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
+import User from './models/user.model'
 import userRouter from './routers/user.router'
 import db from './services/db'
-import sequelize from './services/sequelize'
 
 dotenv.config()
 
@@ -23,7 +23,7 @@ app.use('/api/user', userRouter)
 app.listen(PORT, async () => {
   console.log('Connecting to database...')
   await db.connect()
-  await sequelize.sync()
+  await User.sync()
   console.log('Connection has been established successfully.')
   console.log(`Server is running on port ${PORT}`)
 })
