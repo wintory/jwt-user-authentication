@@ -4,6 +4,7 @@ import User, { Address } from '../models/user.model'
 export const getAllUsers = async (options: FindOptions<any>) => {
   const users = await User.findAll({
     attributes: { exclude: ['password'] },
+    include: { model: Address },
     ...options,
   })
 
@@ -25,12 +26,38 @@ export const createUser = async (userData: any) => {
   return result
 }
 
-export const getUserAddress = async (userId: number) => {
-  const userAddress = await User.findAll({
-    where: { id: userId },
-    include: { model: Address },
-    attributes: { exclude: ['password'] },
-  })
+export const updateUser = async (userId: number, userData: any) => {
+  const result = await User.update(
+    {
+      name: userData?.name,
+      email: userData?.email,
+    },
+    { where: { id: userId } }
+  )
 
-  return userAddress
+  if ((userData?.addresses || []).length > 0) {
+    for (let i = 0; i < userData?.addresses.length; i++) {
+      const addressData = userData?.addresses[i]
+      if (addressData.id) {
+        await Address.update(
+          {
+            address1: addressData.address1,
+          },
+          {
+            where: {
+              id: addressData.id,
+              userId,
+            },
+          }
+        )
+      } else {
+        await Address.create({
+          ...addressData,
+          userId,
+        })
+      }
+    }
+  }
+
+  return result
 }

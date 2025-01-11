@@ -2,9 +2,10 @@ import bcrypt from 'bcrypt'
 import { Request, Response } from 'express'
 import User from '../models/user.model'
 import {
+  createUser,
   getAllUsers,
-  getUserAddress,
   getUserById,
+  updateUser,
 } from '../services/user.service'
 
 export const getAllUserController = async (
@@ -38,22 +39,6 @@ export const getUserController = async (
   }
 }
 
-export const getUserAddressController = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const userId = +req.params.id
-    const users = await getUserAddress(userId)
-    res.status(200).json(users)
-  } catch (error) {
-    console.error(error)
-    res.status(400).json({
-      message: 'Failed to get users',
-    })
-  }
-}
-
 export const registerController = async (
   req: Request,
   res: Response
@@ -72,7 +57,7 @@ export const registerController = async (
 
     const userData = { ...body, password: hash }
 
-    const result = await User.create(userData)
+    const result = await createUser(userData)
 
     if (result) {
       res.status(200).json({
@@ -84,6 +69,39 @@ export const registerController = async (
     console.error(error)
     res.status(400).json({
       message: 'Register failed',
+    })
+  }
+}
+
+export const updateUserController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = +req.params.id
+    const body = req.body
+
+    const user = await User.findAll({ where: { id: userId } })
+
+    if (!user) {
+      res.status(404).json({
+        message: 'User not found',
+      })
+      return
+    }
+
+    const result = await updateUser(userId, body)
+
+    if (result) {
+      res.status(200).json({
+        message: 'Update success',
+      })
+      return
+    }
+  } catch (error) {
+    console.error(error)
+    res.status(400).json({
+      message: 'Update failed',
     })
   }
 }

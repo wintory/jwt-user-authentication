@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize'
 
 import dotenv from 'dotenv'
+import Models from '../models'
 
 dotenv.config()
 
@@ -13,5 +14,14 @@ const sequelize = new Sequelize(
     dialect: 'postgres',
   }
 )
+
+sequelize
+  .authenticate()
+  .then(async () => {
+    await Models.forEach((model) => model.sync({ alter: true }))
+  })
+  .catch((error) => {
+    console.error('Unable to connect to the database:', error)
+  })
 
 export default sequelize

@@ -1,16 +1,16 @@
 import express from 'express'
 import {
   getAllUserController,
-  getUserAddressController,
   getUserController,
   registerController,
+  updateUserController,
 } from '../controllers/users.controller'
 
 const router = express.Router()
 
 router.get('/', getAllUserController)
 router.get('/:id', getUserController)
-router.get('/address/:id', getUserAddressController)
-router.post('/register', registerController)
+router.post('/', registerController)
+router.put('/:id', updateUserController)
 
 export default router
