@@ -7,13 +7,14 @@ import {
   registerController,
   updateUserController,
 } from '../controllers/users.controller'
+import { checkAuth } from '../middleware/auth.middleware'
 
 const router = express.Router()
 
-router.get('/', getAllUserController)
-router.get('/:id', getUserController)
-router.put('/:id', updateUserController)
-router.delete('/:id', deleteUserController)
+router.get('/', checkAuth, getAllUserController)
+router.get('/:id', checkAuth, getUserController)
+router.put('/:id', checkAuth, updateUserController)
+router.delete('/:id', checkAuth, deleteUserController)
 
 router.post('/login', loginController)
 router.post('/register', registerController)
