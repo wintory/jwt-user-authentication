@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import { Request, Response } from 'express'
-import db from '../services/sequelize'
+import User from '../models/user.model'
 
 export const registerController = async (
   req: Request,
@@ -9,12 +9,9 @@ export const registerController = async (
   try {
     const { email, password } = req.body
 
-    // const result = (await db.query(
-    //   'SELECT * FROM users WHERE email = ?' + email
-    // )) as any
-    // const rows = res.json(result.rows) as any
+    let result = await User.console.log({ result })
 
-    // console.log({ rows })
+    // const rows = res.json(result.rows) as any
 
     // if (rows.length) {
     //   res.status(400).send({ message: 'Email is already registered' })
@@ -23,13 +20,14 @@ export const registerController = async (
 
     const hash = await bcrypt.hash(password, 10)
 
-    const userData: any = { email, password: hash }
+    const userData: any = [email, hash]
+    console.log({ userData })
 
-    const result = await db.query(
-      'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *',
-      userData
-    )
-    console.log({ result })
+    // const result = await db.query(
+    //   'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *',
+    //   userData
+    // )
+    // console.log({ result })
   } catch (error) {
     console.error(error)
     res.status(400).json({

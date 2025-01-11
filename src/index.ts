@@ -21,8 +21,9 @@ app.get('/', (_, res) => {
 app.use('/api/user', userRouter)
 
 app.listen(PORT, async () => {
+  console.log('Connecting to database...')
   await db.connect()
-  await sequelize.authenticate()
+  await sequelize.sync()
   console.log('Connection has been established successfully.')
   console.log(`Server is running on port ${PORT}`)
 })
