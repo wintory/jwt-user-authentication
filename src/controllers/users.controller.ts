@@ -1,5 +1,8 @@
 import bcrypt from 'bcrypt'
+import dotenv from 'dotenv'
 import { Request, Response } from 'express'
+import { JWT_EXPIRED_TIME } from '../constants'
+import { generateJWTToken } from '../helpers/token'
 import { IUser } from '../models/user.model'
 import {
   createUser,
@@ -11,8 +14,10 @@ import {
   updateUserAddress,
 } from '../services/user.service'
 
+dotenv.config()
+
 export const getAllUserController = async (
-  req: Request,
+  _: Request,
   res: Response
 ): Promise<void> => {
   try {
@@ -55,6 +60,13 @@ export const loginController = async (
       const isPasswordMatch = await bcrypt.compare(password, user?.password)
 
       if (isPasswordMatch) {
+        const token = generateJWTToken(
+          user?.email,
+          process.env.JWT_SECRET_KEY || '',
+          JWT_EXPIRED_TIME
+        )
+
+        res.cookie('token', token, { secure: true, httpOnly: true })
         res.status(200).json({
           message: 'Login success',
         })
