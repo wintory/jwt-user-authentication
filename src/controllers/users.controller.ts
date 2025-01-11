@@ -1,12 +1,14 @@
 import bcrypt from 'bcrypt'
 import { Request, Response } from 'express'
-import User from '../models/user.model'
+import { IUser } from '../models/user.model'
 import {
   createUser,
   deleteUser,
   getAllUsers,
+  getUserAndPasswordByEmail,
   getUserById,
   updateUser,
+  updateUserAddress,
 } from '../services/user.service'
 
 export const getAllUserController = async (
@@ -40,6 +42,37 @@ export const getUserController = async (
   }
 }
 
+export const loginController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { email, password } = req.body
+
+    const user = (await getUserAndPasswordByEmail(email)) as unknown as IUser
+
+    if (user) {
+      const isPasswordMatch = await bcrypt.compare(password, user?.password)
+
+      if (isPasswordMatch) {
+        res.status(200).json({
+          message: 'Login success',
+        })
+        return
+      }
+    }
+
+    res.status(400).json({
+      message: 'Login failed',
+    })
+  } catch (error) {
+    console.error(error)
+    res.status(400).json({
+      message: 'Login failed',
+    })
+  }
+}
+
 export const registerController = async (
   req: Request,
   res: Response
@@ -47,9 +80,9 @@ export const registerController = async (
   try {
     const body = req.body
 
-    const users = await User.findAll({ where: { email: body?.email } })
+    const users = await getUserAndPasswordByEmail(body?.email)
 
-    if (users.length > 0) {
+    if (users) {
       res.status(400).send({ message: 'Email is already registered' })
       return
     }
@@ -82,7 +115,7 @@ export const updateUserController = async (
     const userId = +req.params.id
     const body = req.body
 
-    const user = await User.findAll({ where: { id: userId } })
+    const user = await getUserById(userId)
 
     if (!user) {
       res.status(404).json({
@@ -92,6 +125,13 @@ export const updateUserController = async (
     }
 
     const result = await updateUser(userId, body)
+
+    if ((body?.addresses || []).length > 0) {
+      for (let i = 0; i < body?.addresses.length; i++) {
+        const addressData = body?.addresses[i]
+        await updateUserAddress(userId, addressData)
+      }
+    }
 
     if (result) {
       res.status(200).json({
@@ -113,7 +153,7 @@ export const deleteUserController = async (
 ): Promise<void> => {
   try {
     const userId = +req.params.id
-    const user = await User.findAll({ where: { id: userId } })
+    const user = await getUserById(userId)
 
     if (!user) {
       res.status(404).json({

@@ -20,6 +20,14 @@ export const getUserById = async (userId: number) => {
   return users
 }
 
+export const getUserAndPasswordByEmail = async (email: string) => {
+  const users = await User.findOne({
+    where: { email },
+  })
+
+  return users
+}
+
 export const createUser = async (userData: any) => {
   const result = await User.create(userData)
 
@@ -35,31 +43,28 @@ export const updateUser = async (userId: number, userData: any) => {
     { where: { id: userId } }
   )
 
-  if ((userData?.addresses || []).length > 0) {
-    for (let i = 0; i < userData?.addresses.length; i++) {
-      const addressData = userData?.addresses[i]
-      if (addressData.id) {
-        await Address.update(
-          {
-            address1: addressData.address1,
-          },
-          {
-            where: {
-              id: addressData.id,
-              userId,
-            },
-          }
-        )
-      } else {
-        await Address.create({
-          ...addressData,
-          userId,
-        })
-      }
-    }
-  }
-
   return result
+}
+
+export const updateUserAddress = async (userId: number, addressData: any) => {
+  if (addressData.id) {
+    await Address.update(
+      {
+        address1: addressData.address1,
+      },
+      {
+        where: {
+          id: addressData.id,
+          userId,
+        },
+      }
+    )
+  } else {
+    await Address.create({
+      ...addressData,
+      userId,
+    })
+  }
 }
 
 export const deleteUser = async (userId: number) => {
