@@ -1,14 +1,50 @@
 import bcrypt from 'bcrypt'
 import { Request, Response } from 'express'
 import User from '../models/user.model'
-import { getAllUsers } from '../services/user.service'
+import {
+  getAllUsers,
+  getUserAddress,
+  getUserById,
+} from '../services/user.service'
+
+export const getAllUserController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const users = await getAllUsers({})
+    res.status(200).json(users)
+  } catch (error) {
+    console.error(error)
+    res.status(400).json({
+      message: 'Failed to get users',
+    })
+  }
+}
 
 export const getUserController = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const users = await getAllUsers({})
+    const userId = +req.params.id
+    const users = await getUserById(userId)
+    res.status(200).json(users)
+  } catch (error) {
+    console.error(error)
+    res.status(400).json({
+      message: 'Failed to get users',
+    })
+  }
+}
+
+export const getUserAddressController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = +req.params.id
+    const users = await getUserAddress(userId)
     res.status(200).json(users)
   } catch (error) {
     console.error(error)
@@ -34,7 +70,7 @@ export const registerController = async (
 
     const hash = await bcrypt.hash(body?.password, 10)
 
-    const userData: any = { ...body, password: hash }
+    const userData = { ...body, password: hash }
 
     const result = await User.create(userData)
 

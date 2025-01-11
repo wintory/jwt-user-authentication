@@ -21,7 +21,7 @@ const User = sequelize.define(
   {}
 )
 
-const Address = sequelize.define(
+export const Address = sequelize.define(
   'addresses',
   {
     address1: {
